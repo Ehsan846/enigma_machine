@@ -65,7 +65,7 @@ class EnigmaRotor:
     def advance(self):
         r = False
         self.offset += 1
-        if self.offset >= len(self.permutation):
+        if self.offset == len(self.permutation):
             r = True
             self.offset = 0
         return r
