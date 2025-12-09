@@ -120,12 +120,14 @@ class EnigmaModel:
         while self.rotors[i].advance() and i >= 0:
             i -= 1
         self.pressed_keys[letter_to_number(letter)] = True
+        self.update()
 
     def key_released(self, letter):
         '''Updates the Enigma Machine when a key is pressed.
         It updates that a key is released.
         '''
         self.pressed_keys[letter_to_number(letter)] = False
+        self.update()
 
     def get_rotor_letter(self, index):
         '''Gets the offset for a rotor at a specific index.
@@ -138,6 +140,7 @@ class EnigmaModel:
         '''Advance a rotor.
         '''
         self.rotors[index].advance()
+        self.update()
 
 def enigma():
     model = EnigmaModel()
