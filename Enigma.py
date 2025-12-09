@@ -1,6 +1,6 @@
 from EnigmaConstants import ROTOR_PERMUTATIONS, ALPHABET, REFLECTOR_PERMUTATION
 
-
+#returns the index of the letter 
 def letter_to_number(letter):
     '''Convert a char to a number
     >>> letter_to_number('A')
@@ -154,6 +154,31 @@ class EnigmaModel:
         '''Advance a rotor.
         '''
         self.rotors[index].advance()
+
+    #Part two
+    #Rotors is the initial settigs. Ex: A C D
+
+    #Thinking process:
+    #I need to initialize the rotors offset. 
+    # So i need to convert the letter to the ord value, and set it to the offset for the given rotor.
+    # Also i need to go through the letters in message and set them to True in  key_pressed function
+    # I also need to return the encrypted letter 
+    # Since i have multiple letters i have to store them, so ill create a variable where i concatinate the encrypted letters
+    def encrypt_message(self,rotors:str,message:str)-> str:
+        #You need to write this
+        output = ""
+        self.rotors[2].offset = ord(rotors[0])
+        self.rotors[1].offset = ord(rotors[1])
+        self.rotors[0].offset = ord(rotors[2])
+
+        for i in message:
+            self.key_pressed(i)
+            temp = map(self.encrypt(i), message)
+            output + temp
+        
+        return output
+
+
 
 def enigma():
     model = EnigmaModel()
