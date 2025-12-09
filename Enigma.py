@@ -159,16 +159,29 @@ class EnigmaModel:
         self.update()
 
     #Part two
-    #Rotors is the initial settigs. Ex: A C D
+    #___________________________________________________________
+    
+    def encrypt_message(self: object, rotors:str, message:str)-> str:
+        """ Encrypts a sequence of letters
 
-    #Thinking process:
-    #I need to initialize the rotors offset. 
-    # So i need to convert the letter to the ord value, and set it to the offset for the given rotor.
-    # Also i need to go through the letters in message and set them to True in  key_pressed function
-    # I also need to return the encrypted letter 
-    # Since i have multiple letters i have to store them, so ill create a variable where i concatinate the encrypted letters
-    def encrypt_message(self,rotors:str,message:str)-> str:
-        #You need to write this
+        Parameters
+        ----------
+        self: class object 
+            The rotor object that contains all the methodes and different permutations
+        
+        rotors: str
+            The rotor settings which is three different letters
+        
+        message: str
+            The message being encrypted. A sequence of strings. 
+
+        Returns
+        -------
+        str
+            A string that consists of the encrypted message, with regards to the initialization
+            of the rotors.
+        """
+        
         output = ""
         self.rotors[2].offset = letter_to_number(rotors[0])
         self.rotors[1].offset = letter_to_number(rotors[1])
@@ -176,18 +189,12 @@ class EnigmaModel:
 
         for i in message:
             self.key_pressed(i)
-            
             message_number = letter_to_number(i)
-
             message_number_encrypted = self.encrypt(message_number)
-
             message_letter = number_to_letter(message_number_encrypted)
 
             output +=  message_letter
 
-  
-
-        print(output)
         return output
 
 
