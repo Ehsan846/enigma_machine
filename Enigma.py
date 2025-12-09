@@ -176,15 +176,16 @@ class EnigmaModel:
 
         for i in message:
             self.key_pressed(i)
-            #The encrypt function takes an integer as an input not a str, so i am getting an ValueError message. If i use the already existing function letter_to_number it will be fixed
-            #Temp is apparently a map object, (touple). I am getting a TypeError, because i am trying to concatinate a touple with a string.
-            # Ill use list() to convert it to a list
             
-        message_numbers = list(map(letter_to_number, message))
+            message_number = letter_to_number(i)
 
-        for numbers in message_numbers:
-            temp = number_to_letter(self.encrypt(numbers))
-            output = output + temp
+            message_number_encrypted = self.encrypt(message_number)
+
+            message_letter = number_to_letter(message_number_encrypted)
+
+            output +=  message_letter
+
+  
 
         print(output)
         return output
