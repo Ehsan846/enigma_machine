@@ -170,9 +170,9 @@ class EnigmaModel:
     def encrypt_message(self,rotors:str,message:str)-> str:
         #You need to write this
         output = ""
-        self.rotors[2].offset = ord(rotors[0])
-        self.rotors[1].offset = ord(rotors[1])
-        self.rotors[0].offset = ord(rotors[2])
+        self.rotors[2].offset = letter_to_number((rotors[0]))
+        self.rotors[1].offset = letter_to_number(ord(rotors[1]))
+        self.rotors[0].offset = letter_to_number(ord(rotors[2]))
 
         for i in message:
             self.key_pressed(i)
