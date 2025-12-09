@@ -52,12 +52,14 @@ class EnigmaRotor:
         self.offset = 0
         self.permutation = list(map(letter_to_number, permutation))
         self.inv_permutation = [0 for _ in range(len(permutation))]
+        #Forstår ikke denne del
         for key in range(len(self.permutation)):
             self.inv_permutation[self.permutation[key]] = key
 
     def get_offset(self):
         return self.offset
 
+    #Encryption function. Returns the index of the encrypted letter
     def pass_through(self, key, forward):
         permutation = self.permutation if forward else self.inv_permutation
         return (permutation[(key + self.offset) % len(permutation)] - self.offset) % len(permutation)
@@ -90,7 +92,7 @@ class EnigmaModel:
                 self.lamps_on[self.encrypt(key)] = True
 
 
-    def is_key_down(self, letter):
+    def is_key_down(self, letter):  
         '''Returns whether a key is pressed down.
         '''
         key = letter_to_number(letter)
@@ -105,20 +107,34 @@ class EnigmaModel:
     def encrypt(self, key):
         '''Encrypts a letter passing it through every rotor and the reflector.
         '''
+        # Self.rotors has the length 3
+        # reversed order is fast, midium, slow 
+
+        #From left to right
+        # The input key goes through the fast, midium and slow rotor, updating the variable key itself. at last we take this  
         for i in reversed(range(len(self.rotors))):
             key = self.rotors[i].pass_through(key, True)
+            #Pass it through the reflector permutation, by find the the element in the reflector at the corresponding index of our key. So it basically finds the letter that sits above it if you imagine the two lists over each other.
         key = list(map(letter_to_number, REFLECTOR_PERMUTATION))[key]
+
+        #From right to left
+        #Now that it has passed through the reflector it goes through the reflectors again, but this time it goes through the slow, medium and at last the fast one. 
         for i in range(len(self.rotors)):
             key = self.rotors[i].pass_through(key, False)
+        #We have returned the final key.
         return key
+
 
     def key_pressed(self, letter):
         '''Updates the Enigma Machine when a key is pressed.
         It advances the rotor and updates that a key is pressed.
         '''
+        #Start with the index of the fast rotor (2)
         i = len(self.rotors) - 1
+        #if the methode advance returns true, and we havnt hit rotor slow, change the rotor to medium.
         while self.rotors[i].advance() and i >= 0:
             i -= 1
+        #Change the value of the index at the lettter to True. 
         self.pressed_keys[letter_to_number(letter)] = True
 
     def key_released(self, letter):
