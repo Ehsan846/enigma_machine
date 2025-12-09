@@ -176,7 +176,8 @@ class EnigmaModel:
 
         for i in message:
             self.key_pressed(i)
-            temp = map(self.encrypt(i), message)
+            #The encrypt function takes an integer as an input not a str, so i am getting an ValueError message. If i use the already existing function letter_to_number it will be fixed
+            temp = (map(self.encrypt(letter_to_number((i))), message))
             output + temp
         
         return output
@@ -186,6 +187,7 @@ class EnigmaModel:
 def enigma():
     model = EnigmaModel()
     model.key_pressed('A')
+    model.encrypt_message("ABC","HEJ")
 
 
 # Startup code
