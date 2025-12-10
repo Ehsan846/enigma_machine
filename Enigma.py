@@ -211,6 +211,19 @@ def find_rotors(message: str, cipher: str) -> str:
           return settings
   return None
 
+def decrypt(message:str) -> str:
+    #One long string
+    words = open("words.txt","r").read()
+    #We seperate the words, in form of a list. 
+    words = words.splitlines()
+
+    for word in words:
+        if len(message) == len(word):
+            setting = find_rotors(word.upper() ,message)
+            if setting != None:
+                model = EnigmaModel().encrypt_message(message, setting)
+                print(model)
+
 
 def tests():
     model = EnigmaModel()
@@ -218,6 +231,7 @@ def tests():
     model = EnigmaModel()
     assert model.encrypt_message("ABC", "DEF") == "QJY"
     assert model.encrypt_message("ABC") == "LAH"
+
 
 def enigma():
     model = EnigmaModel()
@@ -228,4 +242,7 @@ def enigma():
 if __name__ == "__main__":
     # enigma()
     # tests()
-    print(find_rotors("AAA", "XLH"))
+    #print(find_rotors("AAA", "XLH"))
+    pass
+
+print(decrypt("BLMS"))
