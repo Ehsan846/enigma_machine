@@ -183,9 +183,9 @@ class EnigmaModel:
         """
         
         output = ""
-        self.rotors[2].offset = letter_to_number(rotors[0])
+        self.rotors[0].offset = letter_to_number(rotors[0])
         self.rotors[1].offset = letter_to_number(rotors[1])
-        self.rotors[0].offset = letter_to_number(rotors[2])
+        self.rotors[2].offset = letter_to_number(rotors[2])
 
         for i in message:
             self.key_pressed(i)
@@ -201,8 +201,7 @@ class EnigmaModel:
 
 def enigma():
     model = EnigmaModel()
-    model.key_pressed('A')
-    model.encrypt_message("ABC","JJHHSSAAEE")
+    print(model.encrypt_message("ABC","QQQ"))
 
 
 # Startup code
