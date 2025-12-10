@@ -201,6 +201,17 @@ class EnigmaModel:
         return output
 
 
+def find_rotors(message: str, cipher: str) -> str:
+  model = EnigmaModel()
+  for a in ALPHABET:
+    for b in ALPHABET:
+      for c in ALPHABET:
+        settings = a + b + c
+        if model.encrypt_message(message, settings) == cipher:
+          return settings
+  return None
+
+
 def tests():
     model = EnigmaModel()
     assert model.encrypt_message("QQQ", "ABC") == "BWP"
@@ -210,10 +221,11 @@ def tests():
 
 def enigma():
     model = EnigmaModel()
-    print(model.encrypt_message("ABC","QQQ"))
+    print(model.encrypt_message("ABC","LZN"))
 
 
 # Startup code
 if __name__ == "__main__":
     # enigma()
-    tests()
+    # tests()
+    print(find_rotors("AAA", "XLH"))
