@@ -161,7 +161,7 @@ class EnigmaModel:
     #Part two
     #___________________________________________________________
     
-    def encrypt_message(self: object, rotors:str, message:str)-> str:
+    def encrypt_message(self: object, message: str, rotors: str = None) -> str:
         """ Encrypts a sequence of letters
 
         Parameters
@@ -169,12 +169,13 @@ class EnigmaModel:
         self: class object 
             The rotor object that contains all the methodes and different permutations
         
-        rotors: str
-            The rotor settings which is three different letters
-        
         message: str
-            The message being encrypted. A sequence of strings. 
+            The message being encrypted. A sequence of strings.
 
+        rotors: str
+            If the rotor settings are given it will set the state of the rotors.
+            Otherwise it will use the current settings.
+        
         Returns
         -------
         str
@@ -182,11 +183,13 @@ class EnigmaModel:
             of the rotors.
         """
         
-        output = ""
-        self.rotors[0].offset = letter_to_number(rotors[0])
-        self.rotors[1].offset = letter_to_number(rotors[1])
-        self.rotors[2].offset = letter_to_number(rotors[2])
+        if rotors:
+            assert len(rotors) == 3
+            self.rotors[0].offset = letter_to_number(rotors[0])
+            self.rotors[1].offset = letter_to_number(rotors[1])
+            self.rotors[2].offset = letter_to_number(rotors[2])
 
+        output = ""
         for i in message:
             self.key_pressed(i)
             message_number = letter_to_number(i)
@@ -198,6 +201,12 @@ class EnigmaModel:
         return output
 
 
+def tests():
+    model = EnigmaModel()
+    assert model.encrypt_message("QQQ", "ABC") == "BWP"
+    model = EnigmaModel()
+    assert model.encrypt_message("ABC", "DEF") == "QJY"
+    assert model.encrypt_message("ABC") == "LAH"
 
 def enigma():
     model = EnigmaModel()
@@ -206,4 +215,5 @@ def enigma():
 
 # Startup code
 if __name__ == "__main__":
-    enigma()
+    # enigma()
+    tests()
