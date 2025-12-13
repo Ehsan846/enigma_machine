@@ -202,13 +202,23 @@ class EnigmaModel:
 
 
 def find_rotors(message: str, cipher: str) -> str:
+  cipher = list(map(letter_to_number, cipher))
   model = EnigmaModel()
-  for a in ALPHABET:
-    for b in ALPHABET:
-      for c in ALPHABET:
-        settings = a + b + c
-        if model.encrypt_message(message, settings) == cipher:
-          return settings
+  for r1 in ALPHABET:
+    for r2 in ALPHABET:
+      for r3 in ALPHABET:
+        model.rotors[0].offset = letter_to_number(r1)
+        model.rotors[1].offset = letter_to_number(r2)
+        model.rotors[2].offset = letter_to_number(r3)
+        correct = True
+        for m, c in zip(message, cipher):
+            model.key_pressed(m)
+            ctest = model.encrypt(letter_to_number(m))
+            if ctest != c:
+              correct = False
+              break
+        if correct:
+          return r1 + r2 + r3
   return None
 
 
@@ -220,12 +230,11 @@ def tests():
     assert model.encrypt_message("ABC") == "LAH"
 
 def enigma():
-    model = EnigmaModel()
-    print(model.encrypt_message("ABC","LZN"))
+  pass
 
 
 # Startup code
 if __name__ == "__main__":
-    # enigma()
-    # tests()
-    print(find_rotors("AAA", "XLH"))
+    print(find_rotors("COX", "GYC"))
+    model = EnigmaModel()
+    print(model.encrypt_message("COX","LYU"))
