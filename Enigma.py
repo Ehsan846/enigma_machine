@@ -1,4 +1,5 @@
 from EnigmaConstants import ROTOR_PERMUTATIONS, ALPHABET, REFLECTOR_PERMUTATION
+from itertools import product
 
 #returns the index of the letter 
 def letter_to_number(letter):
@@ -67,7 +68,7 @@ class EnigmaRotor:
     def advance(self):
         r = False
         self.offset += 1
-        if self.offset == len(self.permutation):
+        if self.offset >= len(self.permutation):
             r = True
             self.offset = 0
         return r
@@ -82,14 +83,12 @@ class EnigmaModel:
 
 
     def update(self):
-        """Sends an update request to all the views.
-        And encrypts every pressed key.
+        """Encrypts every pressed key.
         """
         for i in range(len(self.lamps_on)):
             self.lamps_on[i] = False
-        for key, is_on in enumerate(self.pressed_keys):
-            if is_on:
-                self.lamps_on[self.encrypt(key)] = True
+        for key in filter(lambda x: x, self.pressed_keys):
+          self.lamps_on[self.encrypt(key)] = True
 
 
     def is_key_down(self, letter):  
@@ -115,7 +114,7 @@ class EnigmaModel:
         for i in reversed(range(len(self.rotors))):
             key = self.rotors[i].pass_through(key, True)
             #Pass it through the reflector permutation, by find the the element in the reflector at the corresponding index of our key. So it basically finds the letter that sits above it if you imagine the two lists over each other.
-        key = list(map(letter_to_number, REFLECTOR_PERMUTATION))[key]
+        key = letter_to_number(REFLECTOR_PERMUTATION[key])
 
         #From right to left
         #Now that it has passed through the reflector it goes through the reflectors again, but this time it goes through the slow, medium and at last the fast one. 
@@ -202,13 +201,21 @@ class EnigmaModel:
 
 
 def find_rotors(message: str, cipher: str) -> str:
+  cipher = list(map(letter_to_number, cipher))
   model = EnigmaModel()
-  for a in ALPHABET:
-    for b in ALPHABET:
-      for c in ALPHABET:
-        settings = a + b + c
-        if model.encrypt_message(message, settings) == cipher:
-          return settings
+  for rotors in product(map(letter_to_number, ALPHABET), repeat=3):
+    model.rotors[0].offset = rotors[0]
+    model.rotors[1].offset = rotors[1]
+    model.rotors[2].offset = rotors[2]
+    correct = True
+    for m, c in zip(message, cipher):
+      model.key_pressed(m)
+      ctest = model.encrypt(letter_to_number(m))
+      if ctest != c:
+        correct = False
+        break
+    if correct:
+      return "".join(map(number_to_letter, rotors))
   return None
 
 def decrypt(message:str) -> str:
@@ -234,8 +241,7 @@ def tests():
 
 
 def enigma():
-    model = EnigmaModel()
-    print(model.encrypt_message("ABC","LZN"))
+  pass
 
 
 # Startup code
