@@ -189,7 +189,10 @@ class EnigmaModel:
             self.rotors[2].offset = letter_to_number(rotors[2])
 
         output = ""
-        for i in message:
+        for i in message.upper():
+            if i not in ALPHABET:
+              output += i
+              continue
             self.key_pressed(i)
             message_number = letter_to_number(i)
             message_number_encrypted = self.encrypt(message_number)
@@ -246,9 +249,8 @@ def enigma():
 
 # Startup code
 if __name__ == "__main__":
-    # enigma()
-    # tests()
-    #print(find_rotors("AAA", "XLH"))
-    pass
+  model = EnigmaModel()
+  print(model.encrypt_message("Hej med dig", "ABC"))
 
-print(decrypt("BLMS"))
+
+
