@@ -1,4 +1,5 @@
 from EnigmaConstants import ROTOR_PERMUTATIONS, ALPHABET, REFLECTOR_PERMUTATION
+import time
 from itertools import product
 
 #returns the index of the letter 
@@ -222,34 +223,17 @@ class EnigmaModel:
                 return "".join(rotors)
         return None
 
-
-
-
 def decrypt(cipher:str) -> str:
-    #One long string
     words = open("words.txt","r").read()
-    #We seperate the words, in form of a list. 
-    words = [x.upper() for x in words.splitlines()]
+    words = set(x.upper() for x in words.splitlines())
 
     cipher = cipher.split()
-    wordlists = []
-    for c in cipher:
-      thiswords = []
-      l = len(c)
-      for word in words:
-        if len(word) != l:
-          continue
-        if any(map(lambda x: x[0] == x[1], zip(word, c))):
-          continue
-        thiswords.append(word)
-      wordlists.append(thiswords)
-
     model = EnigmaModel()
     for rotors in product(ALPHABET, repeat=3):
       model.set_rotors(rotors)
       for i, c in enumerate(cipher):
         out = model.encrypt_message(c)
-        if out not in wordlists[i]:
+        if out not in words:
           break
       else:
         return model.encrypt_message(" ".join(cipher), rotors)
@@ -269,7 +253,7 @@ def enigma():
 # Startup code
 if __name__ == "__main__":
   model = EnigmaModel()
-  asd = model.encrypt_message("Hello world", "PBD")
+  asd = model.encrypt_message("Hello world", "XYZ")
   s = time.time()
   print(decrypt(asd))
   e = time.time()
