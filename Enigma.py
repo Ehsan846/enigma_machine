@@ -223,7 +223,7 @@ class EnigmaModel:
                 return "".join(rotors)
         return None
 
-def decrypt(cipher:str) -> str:
+def decrypt_space(cipher:str) -> str:
     words = open("words.txt","r").read()
     words = set(x.upper() for x in words.splitlines())
 
@@ -238,6 +238,24 @@ def decrypt(cipher:str) -> str:
       else:
         return model.encrypt_message(" ".join(cipher), rotors)
 
+def decrypt_no_space(cipher:str) -> str:
+    words = open("words.txt","r").read()
+    words = set(x.upper() for x in words.splitlines())
+
+    model = EnigmaModel()
+    length = len(cipher)
+    for rotors in product(ALPHABET, repeat=3):
+      out = model.encrypt_message(cipher, rotors)
+      l = 0
+      r = 1
+      while r <= length:
+        if out[l:r] in words:
+          l = r
+        r += 1
+      if r - l <= 1:
+        return out
+
+
 
 def tests():
     model = EnigmaModel()
@@ -247,17 +265,30 @@ def tests():
     assert model.encrypt_message("ABC") == "LAH"
 
 
- 
+def test_decrypt():
+  model = EnigmaModel()
+  input = "HIMOM"
+  asd = model.encrypt_message(input, "ABC")
+  s = time.time()
+  output = decrypt_no_space(asd)
+  e = time.time()
+  print(e- s)
+  assert input == output
+
+  input = "HELLO WORLD"
+  asd = model.encrypt_message(input, "XYZ")
+  s = time.time()
+  output = decrypt_space(asd)
+  e = time.time()
+  print(e- s)
+  assert input == output
+
+
 def enigma():
   pass
 # Startup code
 if __name__ == "__main__":
-  model = EnigmaModel()
-  asd = model.encrypt_message("Hello world", "XYZ")
-  s = time.time()
-  print(decrypt(asd))
-  e = time.time()
-  print(e- s)
+  test_decrypt()
 
 
 
