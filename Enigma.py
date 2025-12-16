@@ -82,6 +82,11 @@ class EnigmaModel:
         self.rotors = list(map(EnigmaRotor, ROTOR_PERMUTATIONS))
 
 
+    def set_rotors(self, setting):
+        self.rotors[0].offset = letter_to_number(setting[0])
+        self.rotors[1].offset = letter_to_number(setting[1])
+        self.rotors[2].offset = letter_to_number(setting[2])
+
     def update(self):
         """Encrypts every pressed key.
         """
@@ -184,9 +189,7 @@ class EnigmaModel:
         
         if rotors:
             assert len(rotors) == 3
-            self.rotors[0].offset = letter_to_number(rotors[0])
-            self.rotors[1].offset = letter_to_number(rotors[1])
-            self.rotors[2].offset = letter_to_number(rotors[2])
+            self.set_rotors(rotors)
 
         output = ""
         for i in message.upper():
@@ -204,35 +207,48 @@ class EnigmaModel:
 
 
 def find_rotors(message: str, cipher: str) -> str:
-  cipher = list(map(letter_to_number, cipher))
-  model = EnigmaModel()
-  for rotors in product(map(letter_to_number, ALPHABET), repeat=3):
-    model.rotors[0].offset = rotors[0]
-    model.rotors[1].offset = rotors[1]
-    model.rotors[2].offset = rotors[2]
-    correct = True
-    for m, c in zip(message, cipher):
-      model.key_pressed(m)
-      ctest = model.encrypt(letter_to_number(m))
-      if ctest != c:
-        correct = False
-        break
-    if correct:
-      return "".join(map(number_to_letter, rotors))
-  return None
+    model = EnigmaModel()
+    for rotors in product(ALPHABET, repeat=3):
+        model.set_rotors(rotors)
+        correct = True
+        for m, c in zip(message, cipher):
+            model.key_pressed(m)
+            ctest = model.encrypt(letter_to_number(m))
+            if ctest != letter_to_number(c):
+                correct = False
+                break
+        if correct:
+            return "".join(rotors)
+    return None
 
 def decrypt(message:str) -> str:
     #One long string
     words = open("words.txt","r").read()
     #We seperate the words, in form of a list. 
-    words = words.splitlines()
+    words = [x.upper() for x in words.splitlines()]
 
+    message_words = message.split()
+    first_len = len(message_words[0])
+    print(message_words)
     for word in words:
-        if len(message) == len(word):
-            setting = find_rotors(word.upper() ,message)
-            if setting != None:
-                model = EnigmaModel().encrypt_message(message, setting)
-                print(model)
+        if first_len != len(word):
+            continue
+        setting = find_rotors(word ,message_words[0])
+        if setting == None:
+            continue
+        model = EnigmaModel()
+        model.set_rotors(setting)
+        correct = True
+        out = []
+        for i in range(len(message_words)):
+            out.append(model.encrypt_message(message_words[i]))
+            print(out[-1])
+            if out[-1] not in words:
+                correct = False
+                break
+        if correct:
+            return " ".join(out)
+
 
 
 def tests():
@@ -246,11 +262,13 @@ def tests():
 def enigma():
   pass
 
-
 # Startup code
 if __name__ == "__main__":
   model = EnigmaModel()
-  print(model.encrypt_message("Hej med dig", "ABC"))
+  print(model.encrypt_message("abasement mom and dad", "ABC"))
+  print(decrypt("SABFJGOGY ZUQ XTR XVM"))
+  # print(find_rotors("ABCDEFGHIJKL", "SARUJZIFAQJP"))
+
 
 
 
