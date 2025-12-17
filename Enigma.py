@@ -172,15 +172,6 @@ class EnigmaModel:
     def encrypt_message(self: object, message: str, rotors: str = None) -> str:
         """ Encrypts a sequence of letters
 
-        >>> model = EnigmaModel()
-        >>> model.encrypt_message("QQQ", "ABC")
-        'BWP'
-        >>> model = EnigmaModel()
-        >>> model.encrypt_message("ABC", "DEF")
-        'QJY'
-        >>> model.encrypt_message("ABC")
-        'LAH'
-
         Parameters
         ----------
         self: class object 
@@ -198,6 +189,16 @@ class EnigmaModel:
         str
             A string that consists of the encrypted message, with regards to the initialization
             of the rotors.
+
+        
+        >>> model = EnigmaModel()
+        >>> model.encrypt_message("QQQ", "ABC")
+        'BWP'
+        >>> model = EnigmaModel()
+        >>> model.encrypt_message("ABC", "DEF")
+        'QJY'
+        >>> model.encrypt_message("ABC")
+        'LAH'
         """
         
         if rotors:
