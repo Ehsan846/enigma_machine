@@ -2,7 +2,6 @@ from EnigmaConstants import ROTOR_PERMUTATIONS, ALPHABET, REFLECTOR_PERMUTATION
 import time
 from itertools import product
 
-#returns the index of the letter 
 def letter_to_number(letter):
     '''Convert a char to a number
     >>> letter_to_number('A')
@@ -173,6 +172,15 @@ class EnigmaModel:
     def encrypt_message(self: object, message: str, rotors: str = None) -> str:
         """ Encrypts a sequence of letters
 
+        >>> model = EnigmaModel()
+        >>> model.encrypt_message("QQQ", "ABC")
+        'BWP'
+        >>> model = EnigmaModel()
+        >>> model.encrypt_message("ABC", "DEF")
+        'QJY'
+        >>> model.encrypt_message("ABC")
+        'LAH'
+
         Parameters
         ----------
         self: class object 
@@ -254,49 +262,63 @@ class EnigmaModel:
 
 
 def decrypt(cipher:str) -> str:
+    """Decrypts a message that is split by spaces.
+
+    >>> model = EnigmaModel()
+    >>> model.encrypt_message("HELLO WORLD", "XYZ")
+    'BPJBJ KTXOI'
+    >>> decrypt('BPJBJ KTXOI')
+    'HELLO WORLD'
+    >>> model.encrypt_message("ASDFJKL", "XYZ")
+    'RLNTOWD'
+    >>> decrypt('RLNTOWD') # Doesnt return anything because its invalid
+
+
+    Parameters
+    ----------
+    cipher: str
+        The message being decrypted.
+
+    Returns
+    -------
+    str
+      The original message
+    """
     words = open("words.txt","r").read()
     words = set(x.upper() for x in words.splitlines())
 
     cipher = cipher.split()
     model = EnigmaModel()
     for rotors in product(ALPHABET, repeat=3):
-      model.set_rotors(rotors)
-      for c in cipher:
-        out = model.encrypt_message(c)
-        if out not in words:
-          break
-      else:
-        return model.encrypt_message(" ".join(cipher), rotors)
+        model.set_rotors(rotors)
+        for c in cipher:
+            out = model.encrypt_message(c)
+            if out not in words:
+                break
+        else:
+            return model.encrypt_message(" ".join(cipher), rotors)
 
 
 
 
 
-def tests():
+def time_decrypt():
+    input = "HI MOM AND DAD WHAT THE HELL"
     model = EnigmaModel()
-    assert model.encrypt_message("QQQ", "ABC") == "BWP"
-    model = EnigmaModel()
-    assert model.encrypt_message("ABC", "DEF") == "QJY"
-    assert model.encrypt_message("ABC") == "LAH"
-
-
-def test_decrypt():
-  input = "HI MOM AND DAD WHAT THE HELL"
-  model = EnigmaModel()
-  asd = model.encrypt_message(input, "XYZ")
-  s = time.time()
-  output = decrypt(asd)
-  e = time.time()
-  print(e- s, output)
-  assert input == output
+    asd = model.encrypt_message(input, "XYZ")
+    s = time.time()
+    output = decrypt(asd)
+    e = time.time()
+    print(e - s, output)
+    assert input == output
 
 
 def enigma():
-  pass
+    pass
+
 # Startup code
 if __name__ == "__main__":
-  test_decrypt()
-  # print(is_valid("ilikewhatlikefood", {"i", "like", "food", "what"}))
+    time_decrypt()
 
 
 
