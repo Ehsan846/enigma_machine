@@ -223,6 +223,29 @@ class EnigmaModel:
                 return "".join(rotors)
         return None
 
+def is_valid(out, words):
+  length = len(out)
+  # cansegment[i] represents where out[:i] can be segmented
+  cansegment = [False]*(length+1)
+  cansegment[0] = True
+  for i in range(1, length+1):
+    cansegment[i] = any(cansegment[j] and out[j:i] in words for j in range(i))
+  return cansegment[length]
+
+
+def decrypt_no_space(cipher:str) -> str:
+  words = open("words.txt","r").read()
+  words = set(x.upper() for x in words.splitlines())
+
+  model = EnigmaModel()
+  length = len(cipher)
+  for rotors in product(ALPHABET, repeat=3):
+    out = model.encrypt_message(cipher, rotors)
+    if is_valid(out, words):
+      return out
+  return None
+
+
 def decrypt_space(cipher:str) -> str:
     words = open("words.txt","r").read()
     words = set(x.upper() for x in words.splitlines())
@@ -231,29 +254,14 @@ def decrypt_space(cipher:str) -> str:
     model = EnigmaModel()
     for rotors in product(ALPHABET, repeat=3):
       model.set_rotors(rotors)
-      for i, c in enumerate(cipher):
+      for c in cipher:
         out = model.encrypt_message(c)
         if out not in words:
           break
       else:
         return model.encrypt_message(" ".join(cipher), rotors)
 
-def decrypt_no_space(cipher:str) -> str:
-    words = open("words.txt","r").read()
-    words = set(x.upper() for x in words.splitlines())
 
-    model = EnigmaModel()
-    length = len(cipher)
-    for rotors in product(ALPHABET, repeat=3):
-      out = model.encrypt_message(cipher, rotors)
-      l = 0
-      r = 1
-      while r <= length:
-        if out[l:r] in words:
-          l = r
-        r += 1
-      if r - l <= 1:
-        return out
 
 
 
@@ -267,28 +275,30 @@ def tests():
 
 def test_decrypt():
   model = EnigmaModel()
-  input = "HIMOM"
-  asd = model.encrypt_message(input, "ABC")
+  input = "HIMOMANDDADWHATTHEHELL"
+  asd = model.encrypt_message(input, "XYZ")
+  print(asd)
   s = time.time()
   output = decrypt_no_space(asd)
   e = time.time()
-  print(e- s)
+  print(e- s, output)
   assert input == output
 
-  input = "HELLO WORLD"
+  input = "HI MOM AND DAD WHAT THE HELL"
   asd = model.encrypt_message(input, "XYZ")
   s = time.time()
   output = decrypt_space(asd)
   e = time.time()
-  print(e- s)
+  print(e- s, output)
   assert input == output
-
+  print(decrypt_no_space("MNBOASVTTB"))
 
 def enigma():
   pass
 # Startup code
 if __name__ == "__main__":
   test_decrypt()
+  # print(is_valid("ilikewhatlikefood", {"i", "like", "food", "what"}))
 
 
 
