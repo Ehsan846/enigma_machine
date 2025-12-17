@@ -300,8 +300,6 @@ def decrypt(cipher:str) -> str:
 
 
 
-
-
 def time_decrypt():
     input = "HI MOM AND DAD WHAT THE HELL"
     model = EnigmaModel()
@@ -313,12 +311,6 @@ def time_decrypt():
     assert input == output
 
 
-def enigma():
-    pass
-
-# Startup code
-if __name__ == "__main__":
-    time_decrypt()
 
 
 
