@@ -210,6 +210,35 @@ class EnigmaModel:
         return output
 
     def find_rotors(self, message: str, cipher: str) -> str:
+        """ Creates different permutations with 3 letters in the alphabet. Tries these different settings,
+        and uses the one which has the correct rotor settings for encryption to get the same message. 
+
+        Parameters
+        ----------
+        self: class object 
+            The rotor object that contains all the methodes and different permutations
+        
+        message: str
+            The message being encrypted. A sequence of strings.
+
+        cipher: str
+            The encrypted message from with some rotor settings.
+        
+        Returns
+        -------
+        str
+            A string that consists of the the rotor settings
+
+        Doctests:
+        >>> model = EnigmaModel()
+        >>> model.find_rotors("HELLO","SYBOU")
+        'BFE'
+
+        >>> model.find_rotors("Dhanyavaad", "Namaste")
+        
+
+        """
+        
         message = [letter_to_number(x) for x in message]
         cipher = [letter_to_number(x) for x in cipher]
         length = len(cipher)
