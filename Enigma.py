@@ -242,7 +242,7 @@ class EnigmaModel:
         >>> model.find_rotors("HELLO","SYBOU")
         'BFE'
 
-        >>> model.find_rotors("Dhanyavaad", "Namaste")
+        >>> model.find_rotors("Dhanyavaad", "Namaste") #Doesn't return anything because its invalid
         
 
         """
@@ -264,16 +264,6 @@ class EnigmaModel:
 def decrypt(cipher:str) -> str:
     """Decrypts a message that is split by spaces.
 
-    >>> model = EnigmaModel()
-    >>> model.encrypt_message("HELLO WORLD", "XYZ")
-    'BPJBJ KTXOI'
-    >>> decrypt('BPJBJ KTXOI')
-    'HELLO WORLD'
-    >>> model.encrypt_message("ASDFJKL", "XYZ")
-    'RLNTOWD'
-    >>> decrypt('RLNTOWD') # Doesnt return anything because its invalid
-
-
     Parameters
     ----------
     cipher: str
@@ -283,6 +273,15 @@ def decrypt(cipher:str) -> str:
     -------
     str
       The original message
+
+    >>> model = EnigmaModel()
+    >>> model.encrypt_message("HELLO WORLD", "XYZ")
+    'BPJBJ KTXOI'
+    >>> decrypt('BPJBJ KTXOI')
+    'HELLO WORLD'
+    >>> model.encrypt_message("ASDFJKL", "XYZ")
+    'RLNTOWD'
+    >>> decrypt('RLNTOWD') # Doesnt return anything because its invalid  
     """
     words = open("words.txt","r").read()
     words = set(x.upper() for x in words.splitlines())
