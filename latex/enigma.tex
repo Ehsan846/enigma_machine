@@ -1,5 +1,190 @@
 \documentclass{article}
+\usepackage{listings}
+\usepackage{graphicx} 
 
 \begin{document}
-  Hej med dig.
+
+\begin{titlepage}
+    \centering
+
+
+
+    {\Huge\bfseries Enigma Machine\par}
+    \vspace{0.4cm}
+    {\Large Part 2\par}
+    \vspace{2cm}
+
+    {\large
+    Ehsan Sorousharzani \&
+    Vincent Kirk Bonné\par}
+    \vspace{1.5cm}
+
+
+    {\large Syddansk Universitet\par}
+    \vspace{0.5cm}
+
+    {\large December 2025\par}
+
+    \vfill
+\end{titlepage}
+
+
+\tableofcontents
+\newpage
+
+
+\section{Introduction}
+
+Our code is in the \verb|Enigma.py|. We have implemented the \verb|encrypt|, \verb|find_rotors| and \verb|decrypt| functions. They are on line 172, 221 and 265 respectively.
+
+\section{Encrypt}
+The encrypt function is designed to take an input in the form of a sequence of letters, while also providing the option to initialize the rotor settings.
+
+\begin{lstlisting}[language=Python]
+def encrypt_message(self: object,
+    message: str,
+    rotors: str = None) -> str:
+\end{lstlisting}
+
+The \verb|encrypt_message| function takes \verb|self|, \verb|message| and \verb|rotors| as parameters. These are of types \verb|"object"|, \verb|"str"|, and \verb|"str"| . The \verb|rotors| parameter has a default value set to \verb|None| if no rotor settings are provided. This allows the message to be encrypted with the offsets already set in the model. The function returns a string containing the encrypted message.
+
+\begin{lstlisting}[language=Python]
+if rotors:
+    assert len(rotors) == 3
+    self.set_rotors(rotors)
+\end{lstlisting}
+
+If rotor settings are provided as an argument, a Python built-in keyword is used to verify that the input has a valid length. If the assertion evaluates to \textbf{False}, an error is raised and the program terminates. Otherwise the program continues to run.
+
+\begin{lstlisting}[language=Python]
+self.rotors[0].offset = letter_to_number(rotors[0])
+self.rotors[1].offset = letter_to_number(rotors[1])
+self.rotors[2].offset = letter_to_number(rotors[2])
+\end{lstlisting}
+
+The \verb|set_rotors()| method selects the individual rotors and sets their offset attributes according to the provided settings. Since each offset is represented as an integer, the characters are converted to numbers using the \verb|letter_to_number| function, as shown above.
+
+The variable \verb|self.rotors| is a list containing the different rotor objects, each with its own permutation and offset. The rotors are ordered from slow to fast from left to right. Therefore, the first character in the \verb|rotors| string sets the offset of the slow rotor.
+
+\newpage
+
+\begin{lstlisting}[language=Python]
+output = ""
+for i in message.upper():
+    if i not in ALPHABET:
+        output += i
+        continue
+    message_number = letter_to_number(i)
+    message_number_encrypted = self.encrypt(message_number)
+    message_letter = number_to_letter(message_number_encrypted)
+
+    output += message_letter
+
+
+\end{lstlisting}
+
+The variable \verb|output| is initialized as an empty string and is used to store the encrypted message. A \textit{for} loop iterates over each character in the input message. If a character is not part of the alphabet, it is appended directly to the output and the loop continues.
+
+For alphabetic characters, the letter is converted to its corresponding  index. This index is then passed to the \verb|encrypt| method, which returns the encrypted letters index . At the end this value is converted back into a letter and concatenated to the \verb|output| string. This process is repeated until the entire message has been encrypted.
+
+
+\section{Find rotors}
+The find rotors function should take two strings the message and the result of encryption. It should then return the settings used for the encryption.
+\begin{lstlisting}[language=Python]
+def find_rotors(message: str, cipher: str) -> str:
+\end{lstlisting}
+The \verb|message| and \verb|cipher| parameters should be in the same format as the output of the \verb|decrypt_message| function. So a string of uppercase letters.
+
+The overall algorithm is to try every rotor setting and see if it is possible to encrypt the message to the cipher using the settings.
+Here is the function.
+
+\begin{lstlisting}[language=Python]
+def find_rotors(self, message: str, cipher: str) -> str:
+    message = [letter_to_number(x) for x in message]
+    cipher = [letter_to_number(x) for x in cipher]
+    length = len(cipher)
+    for rotors in product(ALPHABET, repeat=3):
+        self.set_rotors(rotors)
+        for i in range(length):
+            ctest = self.encrypt(message[i])
+            if ctest != cipher[i]:
+                break
+        else:
+            return "".join(rotors)
+    return None
+    
+\end{lstlisting}
+
+The first two lines convert the message and cipher parameters to lists of numbers using the helper function \verb|letter_to_number|. This function calculates the index in the alphabet of a letter. This means that A becomes 0, B becomes 1, and so on. 
+The fourth line is a for loop where we generate all the possible rotor settings. We use the function product imported from itertools. It calculates the cartesian product of \verb|ALPHABET| three times. We could have also used three nested for loops and it would do the same thing. But we thought that this was nicer. 
+
+In the for loop we set the rotor settings for the model using the helper function \verb|set_rotors|. 
+
+Now we make it to the heart of the algorithm. In our first version of the algorithm we just used the \verb|encrypt_message| function to see if it was the same. But it turns out that you end up doing a lot of unnecessary calculations. That is because you often can know if the settings are incorrect after encrypting the first letter.
+
+We loop through each letter of message and cipher. Where we call the  encrypt method to get the encrypted letter. If it is not equal to what we expect we break out of the loop and try a new setting. The else executes the code if the for loop made it to the end. Meaning we didnt break out of it. This means we have found the correct rotor settings and we can return them. 
+
+\section{Decrypt}
+The decrypt function takes in a string that was encrypted. We assume that the original string was a sentence made up of words in the words.txt file seperated by spaces.
+
+The overall algorithm is trying every rotor combination and encrypting the cipher and seeing if the result is made up of valid words.
+
+\begin{lstlisting}[language=Python]
+def decrypt(cipher:str) -> str:
+    words = open("words.txt","r").read()
+    words = set(x.upper() for x in words.splitlines())
+
+    cipher = cipher.split()
+    model = EnigmaModel()
+    for rotors in product(ALPHABET, repeat=3):
+        model.set_rotors(rotors)
+        for c in cipher:
+            out = model.encrypt_message(c)
+            if out not in words:
+                break
+        else:
+            return model.encrypt_message(" ".join(cipher), rotors)
+\end{lstlisting}
+The function starts out by preparing the words in the words.txt file. We first open the file for reading and read it. Then we, in a list comprehension, split it by lines and convert the words to uppercase. 
+
+Before we used to store the words in a list, but we later changed this to  a hash set because this is much faster than using a list. It makes our code go from executing in 5 seconds or so down to 100 milliseconds. This is because a lookup in a set is constant time compared to lists where it is linear time.
+
+We then split the message by spaces and initialize a model. In the for loop we set the rotor settings and go through every word in the cipher. We then encrypt the word and see if it is in the word list using the hash set lookup. If it isnt we break and try a new setting. If we make it through the entire loop without breaking the else catches that and encrypts the entire message and returns it.
+
+Before we used hash sets we filtered the words so that they were the same length. We also filtered some words out because we know that a letter cant be encrypted to the same. But these optimizations made it slower when we started to use hash sets.
+
+\section{Tests}
+To ensure our code doesn't make semantic errors, we used doctests to ensure the validity of the output of the created functions. 
+
+    
+\begin{lstlisting}[language=Python]
+>>> model = EnigmaModel()
+>>> model.encrypt_message("QQQ", "ABC")
+'BWP'
+>>> model = EnigmaModel()
+>>> model.encrypt_message("ABC", "DEF")
+'QJY'
+>>> model.encrypt_message("ABC")
+'LAH'
+
+\end{lstlisting}
+Here in the first example we use it to ensure that the input \verb|"ABC"| with the rotor settings \verb|"QQQ"| is going to have the output \verb|"BWP"| which would mean it works correctly. In the Third assertion, we ensure that the default settings for the rotors offset works correctly for encryption. We here only provide the argument for message, and since the rotors has been set default to "None" it should go through without an error, and return the output \verb|"LAH"|. 
+
+For the \verb|find_rotors| and function, we made the following doctests:
+
+\begin{lstlisting}[language=Python]
+
+>>> model = EnigmaModel()
+>>> model.find_rotors("HELLO","SYBOU")
+    'BFE'
+
+>>> model.find_rotors("Dhanyavaad", "Namaste")
+
+\end{lstlisting}
+
+In this test we type provide "HELLO"  and its encrypted version as argument with the rotor setting BFE. This ensures that the function returns the correct rotor settings.  In the other doctest, we tried to feed the function inputs which are incorrect, because the ciphered text is not the encrypted message, so the function should return nothing. Since the function doesn't return anything this passes the doctests, and means that it doesn't find random rotor settings for a message and cypher which are not valid. 
+
+
 \end{document}
+
+
