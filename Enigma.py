@@ -265,7 +265,7 @@ class EnigmaModel:
 def decrypt(cipher:str) -> str:
     """Decrypts a message that is split by spaces.
 
-    Parameters
+    Parametersrun time of different of different algorithms
     ----------
     cipher: str
         The message being decrypted.
@@ -313,4 +313,5 @@ def time_decrypt():
 
 
 
-
+#Interactive mode
+#python3 -i Enigma.py
